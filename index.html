@@ -2,73 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMC | Orquestador V2.10</title>
+    <title>SMC | Orquestador V3.0 (Memoria y JSON)</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>[x-cloak] { display: none !important; }</style>
+    <style>
+        [x-cloak] { display: none !important; }
+        .prose { color: #d4d4d8; }
+        .prose h1, .prose h2 { color: #10b981; font-weight: bold; }
+    </style>
 </head>
-<body class="bg-zinc-950 text-zinc-200 min-h-screen p-4 md:p-8">
-
+<body class="bg-zinc-950 text-zinc-200 p-8">
     <div x-data="app()" x-init="init()" class="max-w-6xl mx-auto" x-cloak>
         
-        <header class="mb-8 border-b border-zinc-800 pb-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-3xl font-bold text-emerald-500">SMC | Orquestador V2.10</h1>
-                    <p class="text-zinc-400">Voces Campesinas: <span x-text="phaseTitles[currentPhase]"></span></p>
-                </div>
-                
-                <div class="flex flex-wrap gap-3 items-center">
-                    <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
-                        <span class="text-xs font-semibold text-zinc-400">Modelo:</span>
-                        <select id="modelSelector" class="bg-zinc-900 text-zinc-200 text-xs px-2.5 py-1 rounded-lg border border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold cursor-pointer font-sans">
-                            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                        </select>
-                    </div>
-
-                    <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
-                        <span class="text-xs font-semibold text-zinc-400">API Key:</span>
-                        <input type="password" id="apiKeyInput" placeholder="Pega tu API Key..." class="bg-zinc-900 text-zinc-100 placeholder-zinc-500 text-xs px-3 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-40">
-                    </div>
-                </div>
+        <header class="mb-8 border-b border-zinc-800 pb-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-emerald-500">SMC | Orquestador V3.0</h1>
+            <div class="flex gap-2">
+                <input type="password" id="apiKeyInput" placeholder="Tu API Key" 
+                       class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
+                <select id="modelSelector" class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                </select>
+                <button @click="saveSettings()" class="bg-emerald-600 px-4 py-1 rounded text-sm font-bold">Guardar</button>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-xl">
-                    <h3 class="font-bold text-zinc-100 mb-4 text-sm">⚙️ Contexto Fuente</h3>
-                    <textarea id="campaignTopic" class="w-full h-32 bg-zinc-950 border border-zinc-700 p-3 rounded text-sm focus:border-emerald-500 outline-none text-zinc-300" placeholder="Pega URL o texto aquí (INICIO)..."></textarea>
-                </div>
-
-                <div class="flex flex-col gap-2">
-                    <template x-for="i in 4" :key="i">
-                        <button @click="currentPhase = i" 
-                                :class="currentPhase === i ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-400'"
-                                class="px-4 py-3 rounded-lg text-left font-bold transition border border-zinc-700">
-                            Fase <span x-text="i"></span>
-                        </button>
-                    </template>
-                </div>
+        <div class="grid grid-cols-4 gap-6">
+            <div class="col-span-1 space-y-4">
+                <textarea id="campaignTopic" class="w-full h-32 bg-zinc-900 p-3 rounded text-sm" placeholder="Contexto fuente..."></textarea>
+                <template x-for="i in 4">
+                    <button @click="currentPhase = i" :class="currentPhase === i ? 'bg-emerald-600' : 'bg-zinc-900'" class="w-full p-3 rounded text-left font-bold transition">Fase <span x-text="i"></span></button>
+                </template>
             </div>
 
-            <div class="lg:col-span-3">
-                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl flex flex-col min-h-[500px]">
-                    <h2 class="text-2xl font-semibold text-emerald-400 mb-6" x-text="phaseTitles[currentPhase]"></h2>
-                    
-                    <button @click="handleGenerate()" class="mb-6 bg-amber-600 hover:bg-amber-700 text-black px-6 py-4 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg w-full text-lg">
-                        ⚡ Generar Contenido Profesional
-                    </button>
-
-                    <textarea id="contentOutput" class="flex-grow w-full h-96 bg-zinc-950 border border-zinc-700 rounded-lg p-4 mb-4 focus:ring-2 focus:ring-emerald-500 outline-none text-zinc-300 font-mono text-sm" placeholder="Aquí aparecerá el resultado..."></textarea>
-
-                    <div class="flex justify-between items-center pt-4 border-t border-zinc-800">
-                        <button @click="exportToMarkdown()" class="text-emerald-400 hover:text-white underline text-sm transition">💾 Exportar (.md)</button>
-                        <button x-show="currentPhase < 4" @click="currentPhase++" class="bg-zinc-700 hover:bg-zinc-800 text-white px-8 py-2 rounded font-bold transition">Siguiente Fase →</button>
-                    </div>
-                </div>
+            <div class="col-span-3">
+                <button @click="handleGenerate()" :disabled="loading" class="w-full bg-amber-600 p-4 rounded font-bold">
+                    <span x-show="!loading">⚡ Ejecutar Orquestación Fase <span x-text="currentPhase"></span></span>
+                    <span x-show="loading" class="animate-pulse">Procesando con memoria de contexto...</span>
+                </button>
+                <div id="contentOutput" class="prose mt-6 p-6 bg-zinc-900 rounded-xl min-h-[400px]" 
+                     x-html="marked.parse(contentStore[currentPhase] || '')"></div>
             </div>
         </div>
     </div>
@@ -77,112 +51,58 @@
         function app() {
             return {
                 currentPhase: 1,
-                phaseTitles: { 1: "Radio: Flash y Noticiero", 2: "Blog: Artículo SEO", 3: "Redes Sociales", 4: "Visual: Pieza Digital" },
-                contentStore: { 1: "", 2: "", 3: "", 4: "" },
+                loading: false,
+                contentStore: { 1: '', 2: '', 3: '', 4: '' },
                 
                 init() {
-                    const saved = localStorage.getItem('smc_config_v2');
+                    const saved = localStorage.getItem('smc_config_v3');
                     if (saved) {
                         const config = JSON.parse(saved);
-                        if(config.apiKey) document.getElementById('apiKeyInput').value = config.apiKey;
+                        document.getElementById('apiKeyInput').value = config.apiKey || '';
+                        document.getElementById('modelSelector').value = config.model || 'gemini-1.5-flash';
                     }
                 },
 
+                saveSettings() {
+                    const config = {
+                        apiKey: document.getElementById('apiKeyInput').value,
+                        model: document.getElementById('modelSelector').value
+                    };
+                    localStorage.setItem('smc_config_v3', JSON.stringify(config));
+                    alert("Configuración guardada.");
+                },
+
                 async handleGenerate() {
+                    this.loading = true;
                     const apiKey = document.getElementById('apiKeyInput').value;
                     const model = document.getElementById('modelSelector').value;
                     const topic = document.getElementById('campaignTopic').value;
 
-                    if(!apiKey) { alert('API Key necesaria.'); return; }
-                    document.getElementById('contentOutput').value = "Analizando y redactando fase " + this.currentPhase + "...";
+                    // Lógica de memoria: incluimos lo generado anteriormente
+                    let memory = "";
+                    for(let i=1; i<this.currentPhase; i++) {
+                        memory += `\nResultado Fase ${i}: ${this.contentStore[i]}`;
+                    }
 
-                    // Almacenar key para persistencia
-                    localStorage.setItem('smc_config_v2', JSON.stringify({apiKey}));
-                    
-                    const prompts = {
-                        1: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${topic}. 
-                            Genera estrictamente: 
-                            1. Tres Flash Informativos independientes para "Flash Informativo Conexión Territorial" (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto).
-                            2. Nota de Noticiero formal para "Informativo Conexión Territorial" (Máx 3 min). Incluye Lead, desarrollo con datos/cifras y cierre reflexivo.
-                            INICIO.`,
-                        2: `Actúa como Redactor Senior. Contexto: ${topic}. 
-                            Genera estrictamente:
-                            1. Artículo SEO (500-700 palabras, Estructura: Título SEO, Introducción Gancho, H2/Subtítulos, Conclusión reflexiva). Usa lenguaje sencillo y didáctico.
-                            2. 2 Prompts detallados para Nano Banana (Fotorrealista, alta calidad, contexto rural colombiano, luz natural, personas reales).
-                            INICIO.`,
-                        3: `Actúa como Redactor Senior. Contexto: ${topic}. 
-                            Genera estrictamente:
-                            1. Post para Redes Sociales (Instagram/Facebook). Estructura: Gancho impactante, Cuerpo, CTA claro (invita a blog y radio), y lista obligatoria de 6 Hashtags (Incluir: #Vocescampesinas #ConexiónTerritorial #FlashInformativo + 3 específicos del tema).
-                            INICIO.`,
-                        4: `Actúa como Redactor Senior. Contexto: ${topic}. 
-                            Genera estrictamente:
-                            1. Título corto para pieza digital y un texto breve (pie de página) para redes sociales, enfocado en captar la atención del campesinado colombiano.
-                            INICIO.`
-                    };
+                    const prompt = `Actúa como Editor de Voces Campesinas. Contexto: ${topic}. Memoria: ${memory}. 
+                    Genera el contenido de la Fase ${this.currentPhase}. Responde estrictamente en formato Markdown.`;
 
                     try {
-                        const payload = { contents: [{ parts: [{ text: prompts[this.currentPhase] }] }] };
-                        const data = await this.fetchGeminiWithRetry(apiKey, payload, model);
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                        });
+
+                        const data = await response.json();
+                        const text = data.candidates[0].content.parts[0].text;
                         
-                        if (data && data.candidates && data.candidates[0] && data.candidates[0].content) {
-                            const result = data.candidates[0].content.parts[0].text;
-                            this.contentStore[this.currentPhase] = result;
-                            document.getElementById('contentOutput').value = result;
-                        } else {
-                            document.getElementById('contentOutput').value = "ERROR: La respuesta de la IA no tiene el formato esperado.";
-                        }
+                        this.contentStore[this.currentPhase] = text;
+                        this.loading = false;
                     } catch (e) {
-                        document.getElementById('contentOutput').value = "ERROR TÉCNICO: " + e.message;
+                        alert("Error de conexión. Revisa tu API Key.");
+                        this.loading = false;
                     }
-                },
-                
-                async fetchGeminiWithRetry(apiKey, payload, selectedModel) {
-                    const modelsToTry = [selectedModel, 'gemini-1.5-flash'];
-                    const uniqueModels = [...new Set(modelsToTry)];
-                    let lastError = null;
-                    const apiVersions = ['v1', 'v1beta'];
-
-                    for (const model of uniqueModels) {
-                        for (const apiVersion of apiVersions) {
-                            let delay = 1000;
-                            for (let attempt = 0; attempt < 2; attempt++) {
-                                try {
-                                    const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
-                                    const response = await fetch(url, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify(payload)
-                                    });
-
-                                    if (response.ok) return await response.json();
-                                    
-                                    const errBody = await response.text();
-                                    if (response.status === 404) throw new Error(`404_NOT_FOUND`);
-
-                                    if (response.status === 429 || response.status >= 500) {
-                                        await new Promise(resolve => setTimeout(resolve, delay));
-                                        delay *= 2;
-                                        continue;
-                                    }
-                                    throw new Error(`API ${response.status}: ${errBody}`);
-                                } catch (error) {
-                                    lastError = error;
-                                    if (error.message && error.message.includes("404_NOT_FOUND")) break;
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                }
-                            }
-                        }
-                    }
-                    throw lastError || new Error("Error crítico de comunicación.");
-                },
-                
-                exportToMarkdown() {
-                    const md = Object.keys(this.contentStore).map(i => `### ${this.phaseTitles[i]}\n${this.contentStore[i] || 'Pendiente'}\n\n---\n`).join('\n');
-                    const blob = new Blob([md], { type: 'text/markdown' });
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = `Orquestador_Voces_${new Date().getTime()}.md`;
-                    a.click();
                 }
             }
         }
