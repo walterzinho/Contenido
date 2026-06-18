@@ -142,22 +142,29 @@
                     this.contentStore[this.currentPhase] = "Analizando y redactando...";
                     
                     // Instrucciones de Gems
-                    const prompts = {
-                        1: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${this.campaign.topic}. Genera: 
-                            1. Tres Flash Informativos (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto).
-                            2. Nota de Noticiero formal (Máx 3 min). Nombre: "Informativo Conexión Territorial".
-                            INICIO.`,
-                        2: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
-                            1. Artículo SEO (500-700 palabras, Intro, 3 Subtítulos, Conclusión).
-                            2. 2 Prompts detallados para Nano Banana (estilo fotorrealista Colombia).
-                            INICIO.`,
-                        3: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
-                            1. Post para Redes Sociales (Gancho, CTA, 6 Hashtags).
-                            INICIO.`,
-                        4: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
-                            1. Título corto y texto pie de página para pieza digital.
-                            INICIO.`
-                    };
+                   const prompts = {
+    1: `Actúa como Redactor de noticias para radio Senior de "Voces Campesinas". Contexto: ${this.campaign.topic}. 
+        Genera estrictamente: 
+        1. Tres Flash Informativos independientes para "Flash Informativo Conexión Territorial". (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto).
+        2. Nota de Noticiero formal para "Informativo Conexión Territorial" (Máx 3 min). Incluye Lead, desarrollo con datos/cifras y cierre reflexivo.
+        Usa lenguaje periodístico rural, cercano y empoderador. INICIO.`,
+        
+    2: `Actúa como Redactor de noticias de entorno digital Senior. Contexto: ${this.campaign.topic}. 
+        Genera estrictamente:
+        1. Artículo SEO (500-700 palabras, Estructura: Título SEO, Introducción Gancho, H2/Subtítulos, Conclusión reflexiva). Usa lenguaje sencillo y didáctico.
+        2. 2 Prompts detallados para Nano Banana (Fotorrealista, alta calidad, contexto rural colombiano, luz natural, personas reales).
+        INICIO.`,
+        
+    3: `Actúa como un community manager Senior. Contexto: ${this.campaign.topic}. 
+        Genera estrictamente:
+        1. Post para Redes Sociales (Instagram/Facebook). Estructura: Gancho impactante, Cuerpo, CTA claro (invita a blog y radio), y lista obligatoria de 6 Hashtags (Incluir: #Vocescampesinas #ConexiónTerritorial #FlashInformativo + 3 específicos del tema).
+        INICIO.`,
+        
+    4: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. 
+        Genera estrictamente:
+        1. Título corto para pieza digital y un texto breve (pie de página) para redes sociales, enfocado en captar la atención del campesinado colombiano.
+        INICIO.`
+};
 
                     try {
                         const payload = { contents: [{ parts: [{ text: prompts[this.currentPhase] }] }] };
