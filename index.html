@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMC | Orquestador V2.4</title>
+    <title>SMC | Orquestador V2.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
@@ -15,15 +15,14 @@
         <header class="mb-8 border-b border-gray-800 pb-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-green-500">SMC | Orquestador V2.4</h1>
+                    <h1 class="text-3xl font-bold text-green-500">SMC | Orquestador V2.5</h1>
                     <p class="text-gray-400">Flujo actual: <span x-text="phaseTitles[currentPhase]"></span></p>
                 </div>
                 
                 <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex flex-wrap gap-3 items-center">
                     <select x-model="config.model" class="bg-gray-950 border border-gray-700 text-sm rounded px-2 py-1 outline-none focus:border-green-500 text-white">
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (Recomendado)</option>
                         <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                        <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
                     </select>
                     <div class="relative flex items-center">
                         <input x-model="config.apiKey" :type="showKey ? 'text' : 'password'" placeholder="API Key..." 
@@ -96,7 +95,7 @@
                 
                 async generateContent() {
                     if(!this.config.apiKey) { alert('⚠️ API Key necesaria.'); return; }
-                    this.contentStore[this.currentPhase] = "Conectando con Google AI Studio... Procesando...";
+                    this.contentStore[this.currentPhase] = "Conectando con Google... Procesando...";
                     
                     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:generateContent?key=${this.config.apiKey}`;
                     
