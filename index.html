@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMC | Orquestador V2.7 (Voces Campesinas)</title>
+    <title>SMC | Orquestador V2.8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
@@ -15,7 +15,7 @@
         <header class="mb-8 border-b border-gray-800 pb-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-green-500">SMC | Orquestador V2.7</h1>
+                    <h1 class="text-3xl font-bold text-green-500">SMC | Orquestador V2.8</h1>
                     <p class="text-gray-400">Voces Campesinas: <span x-text="phaseTitles[currentPhase]"></span></p>
                 </div>
                 
@@ -86,33 +86,54 @@
                 saveSettings() { localStorage.setItem('smc_config_v2', JSON.stringify(this.config)); alert('Configuración Guardada'); },
                 nextPhase() { if (this.currentPhase < 4) this.currentPhase++; },
                 
+                async fetchGeminiWithRetry(apiKey, payload, selectedModel) {
+                    const apiVersions = ['v1beta', 'v1'];
+                    for (const apiVersion of apiVersions) {
+                        try {
+                            const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${selectedModel}:generateContent?key=${apiKey}`;
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (response.ok) return await response.json();
+                        } catch (e) { console.error("Error en versión " + apiVersion, e); }
+                    }
+                    throw new Error("No se pudo conectar a la API (probando v1 y v1beta)");
+                },
+
                 async generateContent() {
                     if(!this.config.apiKey) { alert('API Key necesaria.'); return; }
-                    this.contentStore[this.currentPhase] = "Analizando contexto y redactando...";
+                    this.contentStore[this.currentPhase] = "Analizando y redactando...";
                     
                     const prompts = {
-                        1: `Actúa como Redactor Senior para "Voces Campesinas". Usa el contexto: ${this.campaign.topic}. Genera: 
+                        1: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${this.campaign.topic}. Genera: 
                             1. Tres Flash Informativos (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto). Nombre: "Flash Informativo Conexión Territorial".
-                            2. Una Nota de Noticiero formal y rica en datos. Nombre: "Informativo Conexión Territorial" (Máx 3 min de locución).`,
-                        2: `Actúa como Redactor Senior. Usa el contexto: ${this.campaign.topic}. Genera:
-                            1. Artículo para blog "Conexión Territorial" (500-700 palabras, SEO, Intro + 3 subtítulos).
-                            2. Dos prompts detallados para generar imágenes en Nano Banana (estilo fotorrealista, personas/paisajes colombianos).`,
-                        3: `Actúa como Redactor Senior. Usa el contexto: ${this.campaign.topic}. Genera:
+                            2. Una Nota de Noticiero formal (Máx 3-4 min de locución). Nombre: "Informativo Conexión Territorial".
+                            INICIO.`,
+                        2: `Actúa como Redactor Senior para "Conexión Territorial". Contexto: ${this.campaign.topic}. Genera:
+                            1. Artículo SEO (500-700 palabras, Intro + 3 subtítulos).
+                            2. 2 Prompts detallados para Nano Banana (estilo fotorrealista Colombia).
+                            INICIO.`,
+                        3: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${this.campaign.topic}. Genera:
                             1. Texto para Redes Sociales (Gancho, CTA para Blog y Noticiero).
-                            2. 6 Hashtags: 2 palabras clave + temas + #Vocescampesinas #ConexiónTerritorial #FlashInformativo.`,
-                        4: `Actúa como Redactor Senior. Usa el contexto: ${this.campaign.topic}. Genera:
-                            1. Información de imagen: Título corto y texto pie de página para pieza digital.`
+                            2. 6 Hashtags (2 palabras clave + temas + #Vocescampesinas #ConexiónTerritorial #FlashInformativo).
+                            INICIO.`,
+                        4: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
+                            1. Información de imagen: Título corto y texto pie de página para pieza digital.
+                            INICIO.`
                     };
 
                     try {
                         const payload = { contents: [{ parts: [{ text: prompts[this.currentPhase] }] }] };
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:generateContent?key=${this.config.apiKey}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const data = await response.json();
-                        this.contentStore[this.currentPhase] = data.candidates[0].content.parts[0].text;
+                        const data = await this.fetchGeminiWithRetry(this.config.apiKey, payload, this.config.model);
+                        
+                        // Blindaje contra errores de estructura
+                        if (data && data.candidates && data.candidates[0] && data.candidates[0].content) {
+                            this.contentStore[this.currentPhase] = data.candidates[0].content.parts[0].text;
+                        } else {
+                            this.contentStore[this.currentPhase] = "ERROR: La respuesta de la IA no tiene el formato esperado. Reintenta.";
+                        }
                     } catch (e) {
                         this.contentStore[this.currentPhase] = "ERROR TÉCNICO: " + e.message;
                     }
