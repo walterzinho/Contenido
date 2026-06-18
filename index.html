@@ -3,46 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMC | Orquestador V2.8</title>
+    <title>SMC | Orquestador V2.9</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>[x-cloak] { display: none !important; }</style>
 </head>
-<body class="bg-gray-950 text-gray-200 min-h-screen p-4 md:p-8">
+<body class="bg-zinc-950 text-zinc-200 min-h-screen p-4 md:p-8">
 
     <div x-data="app()" x-init="init()" class="max-w-6xl mx-auto" x-cloak>
         
-        <header class="mb-8 border-b border-gray-800 pb-6">
+        <header class="mb-8 border-b border-zinc-800 pb-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-3xl font-bold text-green-500">SMC | Orquestador V2.8</h1>
-                    <p class="text-gray-400">Voces Campesinas: <span x-text="phaseTitles[currentPhase]"></span></p>
+                    <h1 class="text-3xl font-bold text-emerald-500">SMC | Orquestador V2.9</h1>
+                    <p class="text-zinc-400">Voces Campesinas: <span x-text="phaseTitles[currentPhase]"></span></p>
                 </div>
                 
-                <div class="bg-gray-900 border border-gray-800 p-3 rounded-xl flex flex-wrap gap-3 items-center">
-                    <select x-model="config.model" class="bg-gray-950 border border-gray-700 text-sm rounded px-2 py-1 outline-none focus:border-green-500 text-white">
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                        <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
-                    </select>
-                    <input x-model="config.apiKey" type="password" placeholder="API Key..." 
-                           class="bg-gray-950 border border-gray-700 text-sm rounded px-2 py-1 w-48 outline-none focus:border-green-500">
-                    <button @click="saveSettings()" class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm font-bold transition">Guardar</button>
+                <div class="flex flex-wrap gap-3 items-center">
+                    <!-- Modelo Selector -->
+                    <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
+                        <span class="text-xs font-semibold text-zinc-400">Modelo:</span>
+                        <select x-model="config.model" class="bg-zinc-900 text-zinc-200 text-xs px-2.5 py-1 rounded-lg border border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-bold cursor-pointer">
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Recomendado)</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Máxima Calidad)</option>
+                            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                        </select>
+                    </div>
+
+                    <!-- API KEY -->
+                    <div class="bg-zinc-950 p-2.5 rounded-xl border border-zinc-800 flex items-center gap-2">
+                        <span class="text-xs font-semibold text-zinc-400">API Key:</span>
+                        <input x-model="config.apiKey" type="password" placeholder="Pega tu API Key..." 
+                               class="bg-zinc-900 text-zinc-100 placeholder-zinc-500 text-xs px-3 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-40">
+                        <button @click="saveSettings()" class="bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded text-xs font-bold text-white transition">Guardar</button>
+                    </div>
                 </div>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="lg:col-span-1 space-y-6">
-                <div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl">
-                    <h3 class="font-bold text-gray-100 mb-4">⚙️ Contexto Fuente</h3>
-                    <textarea x-model="campaign.topic" class="w-full h-32 bg-gray-950 border border-gray-700 p-3 rounded text-sm focus:border-green-500 outline-none" placeholder="Pega URL o texto aquí (INICIO)..."></textarea>
+                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl shadow-xl">
+                    <h3 class="font-bold text-zinc-100 mb-4 text-sm">⚙️ Contexto Fuente</h3>
+                    <textarea x-model="campaign.topic" class="w-full h-32 bg-zinc-950 border border-zinc-700 p-3 rounded text-sm focus:border-emerald-500 outline-none text-zinc-300" placeholder="Pega URL o texto aquí (INICIO)..."></textarea>
                 </div>
 
                 <div class="flex flex-col gap-2">
                     <template x-for="i in 4" :key="i">
                         <button @click="currentPhase = i" 
-                                :class="currentPhase === i ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-400'"
-                                class="px-4 py-3 rounded-lg text-left font-bold transition border border-gray-700">
+                                :class="currentPhase === i ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-400'"
+                                class="px-4 py-3 rounded-lg text-left font-bold transition border border-zinc-700">
                             Fase <span x-text="i"></span>
                         </button>
                     </template>
@@ -50,20 +60,20 @@
             </div>
 
             <div class="lg:col-span-3">
-                <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl flex flex-col min-h-[500px]">
-                    <h2 class="text-2xl font-semibold text-green-400 mb-6" x-text="phaseTitles[currentPhase]"></h2>
+                <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-xl flex flex-col min-h-[500px]">
+                    <h2 class="text-2xl font-semibold text-emerald-400 mb-6" x-text="phaseTitles[currentPhase]"></h2>
                     
-                    <button @click="generateContent()" class="mb-6 bg-yellow-600 hover:bg-yellow-700 text-black px-6 py-4 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg w-full text-lg">
+                    <button @click="generateContent()" class="mb-6 bg-amber-600 hover:bg-amber-700 text-black px-6 py-4 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg w-full text-lg">
                         ⚡ Generar Contenido Profesional
                     </button>
 
                     <textarea x-model="contentStore[currentPhase]" 
-                              class="flex-grow w-full h-96 bg-gray-950 border border-gray-700 rounded-lg p-4 mb-4 focus:ring-2 focus:ring-green-500 outline-none text-gray-300 font-mono text-sm"
+                              class="flex-grow w-full h-96 bg-zinc-950 border border-zinc-700 rounded-lg p-4 mb-4 focus:ring-2 focus:ring-emerald-500 outline-none text-zinc-300 font-mono text-sm"
                               placeholder="Aquí aparecerá el resultado..."></textarea>
 
-                    <div class="flex justify-between items-center pt-4 border-t border-gray-800">
-                        <button @click="exportToMarkdown()" class="text-green-400 hover:text-white underline text-sm transition">💾 Exportar (.md)</button>
-                        <button x-show="currentPhase < 4" @click="nextPhase()" class="bg-green-700 hover:bg-green-800 text-white px-8 py-2 rounded font-bold transition">Siguiente Fase →</button>
+                    <div class="flex justify-between items-center pt-4 border-t border-zinc-800">
+                        <button @click="exportToMarkdown()" class="text-emerald-400 hover:text-white underline text-sm transition">💾 Exportar (.md)</button>
+                        <button x-show="currentPhase < 4" @click="nextPhase()" class="bg-zinc-700 hover:bg-zinc-800 text-white px-8 py-2 rounded font-bold transition">Siguiente Fase →</button>
                     </div>
                 </div>
             </div>
@@ -86,41 +96,66 @@
                 saveSettings() { localStorage.setItem('smc_config_v2', JSON.stringify(this.config)); alert('Configuración Guardada'); },
                 nextPhase() { if (this.currentPhase < 4) this.currentPhase++; },
                 
+                // Lógica de conexión resiliente (la que funciona)
                 async fetchGeminiWithRetry(apiKey, payload, selectedModel) {
-                    const apiVersions = ['v1beta', 'v1'];
-                    for (const apiVersion of apiVersions) {
-                        try {
-                            const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${selectedModel}:generateContent?key=${apiKey}`;
-                            const response = await fetch(url, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload)
-                            });
-                            if (response.ok) return await response.json();
-                        } catch (e) { console.error("Error en versión " + apiVersion, e); }
+                    const modelsToTry = [selectedModel, 'gemini-1.5-flash', 'gemini-2.5-flash'];
+                    const uniqueModels = [...new Set(modelsToTry)];
+                    let lastError = null;
+                    const apiVersions = ['v1', 'v1beta'];
+
+                    for (const model of uniqueModels) {
+                        for (const apiVersion of apiVersions) {
+                            let delay = 1000;
+                            for (let attempt = 0; attempt < 2; attempt++) {
+                                try {
+                                    const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
+                                    const response = await fetch(url, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify(payload)
+                                    });
+
+                                    if (response.ok) return await response.json();
+                                    
+                                    const errBody = await response.text();
+                                    if (response.status === 404) throw new Error(`404_NOT_FOUND`);
+
+                                    if (response.status === 429 || response.status >= 500) {
+                                        await new Promise(resolve => setTimeout(resolve, delay));
+                                        delay *= 2;
+                                        continue;
+                                    }
+                                    throw new Error(`API ${response.status}: ${errBody}`);
+                                } catch (error) {
+                                    lastError = error;
+                                    if (error.message && error.message.includes("404_NOT_FOUND")) break;
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                }
+                            }
+                        }
                     }
-                    throw new Error("No se pudo conectar a la API (probando v1 y v1beta)");
+                    throw lastError || new Error("Error crítico de comunicación.");
                 },
 
                 async generateContent() {
                     if(!this.config.apiKey) { alert('API Key necesaria.'); return; }
                     this.contentStore[this.currentPhase] = "Analizando y redactando...";
                     
+                    // Instrucciones de Gems
                     const prompts = {
                         1: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${this.campaign.topic}. Genera: 
-                            1. Tres Flash Informativos (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto). Nombre: "Flash Informativo Conexión Territorial".
-                            2. Una Nota de Noticiero formal (Máx 3-4 min de locución). Nombre: "Informativo Conexión Territorial".
+                            1. Tres Flash Informativos (Flash 1: Impacto, Flash 2: Quién/Qué, Flash 3: Causa/Efecto).
+                            2. Nota de Noticiero formal (Máx 3 min). Nombre: "Informativo Conexión Territorial".
                             INICIO.`,
-                        2: `Actúa como Redactor Senior para "Conexión Territorial". Contexto: ${this.campaign.topic}. Genera:
-                            1. Artículo SEO (500-700 palabras, Intro + 3 subtítulos).
+                        2: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
+                            1. Artículo SEO (500-700 palabras, Intro, 3 Subtítulos, Conclusión).
                             2. 2 Prompts detallados para Nano Banana (estilo fotorrealista Colombia).
                             INICIO.`,
-                        3: `Actúa como Redactor Senior para "Voces Campesinas". Contexto: ${this.campaign.topic}. Genera:
-                            1. Texto para Redes Sociales (Gancho, CTA para Blog y Noticiero).
-                            2. 6 Hashtags (2 palabras clave + temas + #Vocescampesinas #ConexiónTerritorial #FlashInformativo).
+                        3: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
+                            1. Post para Redes Sociales (Gancho, CTA, 6 Hashtags).
                             INICIO.`,
                         4: `Actúa como Redactor Senior. Contexto: ${this.campaign.topic}. Genera:
-                            1. Información de imagen: Título corto y texto pie de página para pieza digital.
+                            1. Título corto y texto pie de página para pieza digital.
                             INICIO.`
                     };
 
@@ -128,11 +163,10 @@
                         const payload = { contents: [{ parts: [{ text: prompts[this.currentPhase] }] }] };
                         const data = await this.fetchGeminiWithRetry(this.config.apiKey, payload, this.config.model);
                         
-                        // Blindaje contra errores de estructura
                         if (data && data.candidates && data.candidates[0] && data.candidates[0].content) {
                             this.contentStore[this.currentPhase] = data.candidates[0].content.parts[0].text;
                         } else {
-                            this.contentStore[this.currentPhase] = "ERROR: La respuesta de la IA no tiene el formato esperado. Reintenta.";
+                            this.contentStore[this.currentPhase] = "ERROR: La respuesta de la IA no tiene el formato esperado.";
                         }
                     } catch (e) {
                         this.contentStore[this.currentPhase] = "ERROR TÉCNICO: " + e.message;
