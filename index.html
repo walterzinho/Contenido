@@ -16,7 +16,7 @@
     <div x-data="app()" x-init="init()" class="max-w-6xl mx-auto" x-cloak>
         
         <header class="mb-8 border-b border-zinc-800 pb-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-emerald-500">SMC | Orquestador V3.2</h1>
+            <h1 class="text-2xl font-bold text-emerald-500">SMC | Orquestador V3.3</h1>
             <div class="flex gap-2">
                 <input type="password" id="apiKeyInput" placeholder="Tu API Key" 
                        class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
@@ -73,20 +73,61 @@
                     alert("Configuración guardada.");
                 },
 
-                async handleGenerate() {
-                    this.loading = true;
-                    const apiKey = document.getElementById('apiKeyInput').value;
-                    const model = document.getElementById('modelSelector').value;
-                    const topic = document.getElementById('campaignTopic').value;
+             async handleGenerate() {
+    this.loading = true;
+    const apiKey = document.getElementById('apiKeyInput').value;
+    const model = document.getElementById('modelSelector').value;
+    const topic = document.getElementById('campaignTopic').value;
 
-                    // Lógica de memoria: incluimos lo generado anteriormente
-                    let memory = "";
-                    for(let i=1; i<this.currentPhase; i++) {
-                        memory += `\nResultado Fase ${i}: ${this.contentStore[i]}`;
-                    }
+    // 1. Definición de los Prompts Profesionales
+    const prompts = {
+        1: `Actúa como Redactor Periodístico Senior de "Voces Campesinas punto co". Contexto: ${topic}. Genera de manera EXHAUSTIVA productos de radio: Flash Informativo (3 variantes: 1.Impacto, 2.Positivo, 3.Solución) y Nota de Noticiero formal. Usa estructura Markdown con títulos claros.`,
+        2: `Actúa como Director de Locución para IA. Contexto: ${topic}. 
+            Guion base previo: ${this.contentStore[1] || 'No disponible'}.
+            DIRECTRICES: Inyecta [Acting Cues] en inglés. Usa '--' para pausas dramáticas y '...' para tonos íntimos. NO resumas el texto, solo añade dirección de voz. Aplica los perfiles: FLASH 1 (Dinámico), FLASH 2 (Optimista), FLASH 3 (Reflexivo), NOTA (Anchor formal).`,
+        3: `Actúa como Editor SEO de "Conexión Territorial". Contexto: ${topic}. 
+            1. ARTÍCULO BLOG (500-700 palabras): Usa H1, H2, H3. Lenguaje pedagógico y rural. 
+            2. PROMPTS IMÁGENES: Crea 2 prompts detallados en inglés para Nano Banana (estilo fotorrealista, luz natural, paisajes Colombia, wide shot).`,
+        4: `Actúa como Community Manager de "Voces Campesinas punto co". Contexto: ${topic}. 
+            1. POST REDES: Gancho impactante, CTA claro, y 6 hashtags (#Vocescampesinas #ConexiónTerritorial #FlashInformativo + 3 específicos). 
+            2. DISEÑO: Título corto para imagen y pie de página introductorio.`
+    };
 
-                    const prompt = `Actúa como Editor de Voces Campesinas. Contexto: ${topic}. Memoria: ${memory}. 
-                    Genera el contenido de la Fase ${this.currentPhase}. Responde estrictamente en formato Markdown.`;
+    // 2. Encadenamiento de Memoria
+    const promptSeleccionado = prompts[this.currentPhase];
+    const contextoMemoria = this.currentPhase > 1 ? `\n\nCONTENIDO DE LA FASE ANTERIOR (USAR COMO BASE):\n${this.contentStore[this.currentPhase - 1]}` : "";
+    const promptFinal = promptSeleccionado + contextoMemoria;
+
+    try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                contents: [{ parts: [{ text: promptFinal }] }] 
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.candidates && data.candidates[0].content) {
+            const result = data.candidates[0].content.parts[0].text;
+            
+            // Guardar y renderizar
+            this.contentStore[this.currentPhase] = result;
+            document.getElementById('contentOutput').innerHTML = marked.parse(result);
+            this.phaseStatus[this.currentPhase] = true;
+        } else {
+            throw new Error("Respuesta vacía de la API");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de procesamiento: " + e.message);
+    } finally {
+        this.loading = false;
+    }
+}
 
                     try {
                         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
