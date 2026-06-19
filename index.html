@@ -2,15 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>SMC | Orquestador V3.0 (Memoria y JSON)</title>
+    <title>SMC | Orquestador V3.4</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-        .prose { color: #d4d4d8; }
-        .prose h1, .prose h2 { color: #10b981; font-weight: bold; }
-    </style>
 </head>
 <body class="bg-zinc-950 text-zinc-200 p-8">
     <div x-data="app()" x-init="init()" class="max-w-6xl mx-auto" x-cloak>
@@ -20,10 +15,10 @@
             <div class="flex gap-2">
                 <input type="password" id="apiKeyInput" placeholder="Tu API Key" 
                        class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
-               <select id="modelSelector" class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
-    <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-    <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+              <select id="modelSelector" class="bg-zinc-900 border border-zinc-700 px-3 py-1 rounded text-sm">
+    <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+    <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+    <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp</option>
 </select>
                 <button @click="saveSettings()" class="bg-emerald-600 px-4 py-1 rounded text-sm font-bold">Guardar</button>
             </div>
@@ -100,7 +95,7 @@
     Responde estrictamente en formato Markdown.`;
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+       const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
