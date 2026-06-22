@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSCOGENIA V4.5</title>
+    <title>SYSCOGENIA V4.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -13,7 +13,7 @@
     <div class="p-6 max-w-6xl mx-auto" x-data="orquestador()">
         
         <header class="mb-8 border-b border-zinc-800 pb-6">
-            <h1 class="text-3xl font-bold text-emerald-500">SYSCOGENIA V4.5</h1>
+            <h1 class="text-3xl font-bold text-emerald-500">SISCOGENIA V4.3</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <input type="password" x-model="apiKey" @input="saveData()" placeholder="Tu API Key de Gemini" class="bg-zinc-900 border border-zinc-700 p-2 rounded w-full">
                 <button @click="showPromptEdit = !showPromptEdit" class="bg-zinc-800 text-sm px-4 py-2 rounded">⚙️ Configurar Prompts</button>
@@ -60,25 +60,20 @@
                 prompts: JSON.parse(localStorage.getItem('smc_prompts')) || [
                     `Rol: Actúa como redactor de Noticias para Radio Senior, experto en construcción de guiones para radio, en el entorno rural colombiano
 
-Objetivo: Crear libreto para noticia de noticiero radial y tres libretos tipo flash Informativo en versiones concisas e independientes para ser locutadas, basándote en: {ctx}
+Objetivo: Crear tres libretos tipo flash Informativo en versiones concisas e independientes para ser locutadas y un libreto para noticia de noticiero radial, basándote en: {ctx}
 
 Instrucciones:
 Tipo de Redacción: Flash Informativo tipo Nota(tres flashes) y Noticia para noticiero radial
 Condición: para los flashes Genera 3 titulares distintos y 3 Cuerpos de nota distintos, para la noticia un titular y un cuerpo de noticia
 Duración: Cada flash debe tener una duración no mayor a 2:30 minutos, y la Noticia debe tener una duración máxima de 4 Minutos.
 Formato: para el Flash: Versión - Titular - Cuerpo de la Nota, para la Noticia Versión - Titular - Cuerpo de la Noticia
-Intención de la Redacción Noticia: debe ser neutra, muy descriptiva, resaltar a los participantes y dar información positiva sobre el tema y contexto, y debe contener la estructura: 1. entrada (introducción llamativa, expresiva y que tenga gancho), 2. Cuerpo (desarrollo) y 3. Cierre (Desenlace)
 Intención de la Redacción Flashes: el Flash 1 debe tener una redacción general, el Flash 2 debe tener una redacción con enfoque de “Quien y que” desde lo positivo y el Flash 3 debe tener una redacción Causa y efecto, para que los tres cubran la noticia desde ángulos distintos.
+Intención de la Redacción Noticia: debe ser neutra, muy descriptiva, resaltar a los participantes y dar información positiva sobre el tema y contexto, y debe contener la estructura: 1. entrada (introducción llamativa, expresiva y que tenga gancho), 2. Cuerpo (desarrollo) y 3. Cierre (Desenlace)
 Contenido adicional: Redactar guión de introducción y una salida con respecto al tema de la fuente que sea general, debido a que irían abriendo y cerrando la locución de los tres Flashes.
 Contexto del Contenido adicional: 1 - Nombre de la Emisora: Voces Campesinas Punto Co. 2 - Nombre del microprograma: Informativo “Conexión Territorial”.
 
-Estructura Noticia Radial
-Titular 1: este debe ser de longitud Corta, de Alto Impacto y con gancho
-Cuerpo 1: Redacción concisa y directa. contenido general(recordar que no debe exceder de los 4 Minutos)
-
 Estructura Flashes Informativos:
-
-Entrada General: Guión general con respecto al tema de la nota, muy condensado y que abra los flashes, esta intro es una sola para los tres flashes informativos
+Entrada General: Guión general con respecto al tema de la fuente, muy condensado y que abra los flashes, esta intro es una sola para los tres flashes informativos
 
 FLASH 1
 Titular 1: este debe ser de longitud media, de Alto Impacto
@@ -92,9 +87,13 @@ Titular 3: este debe ser de longitud media con Enfoque Causa y efecto (desde lo 
 
 Salida General: Gión general de cierre con respecto al tema de la fuente, muy condensado y que abra los flashes, esta intro es una sola para los tres flashes informativos.
 
+Estructura Noticia Radial
+Titular 1: este debe ser de longitud Corta, de Alto Impacto y con gancho
+Cuerpo 1: Redacción concisa y directa. contenido general(recordar que no debe exceder de los 4 Minutos)
+
 Que no hacer: 1 - No inventar datos que no estén en el contexto de la Fuente. 2 - Hacer Guiones Cortos de menos de minuto y medio. 3 - Utilizar lenguaje técnico o muy complicado, 4 - Solo generar el guíón literario(libreto) sin indicaciones técnicas como musicalización o tono entre otras solo el texto del flash o de la noticia.`,
-                    'Actúa como ComunnEditor SEO. Contexto: {ctx}. Genera un artículo de blog de 500 palabras optimizado para buscadores, con estructura H1, H2, H3 y CTA al final.',
-                    'Actúa como Director de Arte. Basado en el contexto {ctx} y el artículo {ref}, genera 3 prompts en español detallados para generación de imágenes en Google Flow. Especifica estilo fotorrealista, iluminación cinematográfica, formato 16:9 y parámetros técnicos.',
+                    'Actúa como Editor SEO. Contexto: {ctx}. Genera un artículo de blog de 500 palabras optimizado para buscadores, con estructura H1, H2, H3 y CTA al final.',
+                    'Actúa como Director de Arte. Basado en el contexto {ctx} y el artículo {ref}, genera 3 prompts detallados para generación de imágenes en Google Flow. Especifica estilo fotorrealista, iluminación cinematográfica, formato 16:9 y parámetros técnicos.',
                     'Actúa como Community Manager. Contexto: {ctx}. Genera: 1. Post para Facebook (Gancho + CTA). 2. Post para Instagram (Cuerpo + 6 hashtags relevantes).'
                 ],
                 
